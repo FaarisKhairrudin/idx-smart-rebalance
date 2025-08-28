@@ -1,0 +1,60 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+.python-version
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Logs / experiment outputs
+logs/
+lightning_logs/
+runs/
+wandb/
+outputs/
+
+# Data & models (keep folder, ignore isi)
+notebook/
+!notebook/.gitkeep
+
+saved_models/
+!saved_models/.gitkeep
+
+# Secrets
+.env
+.env.*
+*.pem
+*.key
+
+# Tests / coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Build / packaging
+build/
+dist/
+*.egg-info/
+
+# Editors / OS
+ideas.txt
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+
+# --- Frontend (web) ---
+web/node_modules/
+web/.next/
+web/.cache/
+web/dist/
+web/build/
+web/.nuxt/
+web/.vite/
+web/coverage/

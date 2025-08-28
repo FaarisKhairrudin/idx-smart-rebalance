@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Powered Sectoral Portfolio Optimization</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <!-- Jika ingin Lottie, tambahkan di bawah ini -->
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+</head>
+<body>
+    <!-- Hero Section -->
+    <header class="hero">
+        <div class="hero-bg">
+            <!-- Globe Lottie animasi lokal baru -->
+            <lottie-player src="globe.json" background="transparent" speed="1" style="width: 420px; height: 420px; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 0; opacity: 0.2; pointer-events: none;" loop autoplay></lottie-player>
+        </div>
+        <div class="hero-content">
+            <h1>AI-Powered Sectoral Portfolio Optimization</h1>
+            <p>Menghadapi Volatilitas Pasar Akibat Krisis Global dengan Prediksi Cerdas</p>
+            <button id="heroPredictBtn" class="cta-btn">Mulai Prediksi</button>
+        </div>
+    </header>
+    <main>
+        <!-- Bagian 1: Tantangan Volatilitas & Pentingnya Pendekatan Baru -->
+        <section class="background-narrative">
+            <div class="background-cols">
+                <div class="background-img">
+                    <lottie-player src="Globe_header.json" background="transparent" speed="1" style="width: 220px; height: 220px;" loop autoplay></lottie-player>
+                </div>
+                <div class="background-text">
+                    <h2>Tantangan Volatilitas & Pentingnya Pendekatan Baru</h2>
+                    <p>Mengelola portofolio di dunia yang makin penuh ketidakpastian bukan perkara mudah. Strategi klasik seperti diversifikasi statis atau mean-variance optimization sering kali gagal saat pasar mengalami gejolak besar, seperti saat konflik internasional memanas atau krisis ekonomi melanda.</p>
+                    <p>Di era di mana informasi menyebar dengan sangat cepat dan dampak geopolitik bisa langsung terasa di pasar modal, kita butuh pendekatan yang lebih cerdas, adaptif, dan berbasis data harian.</p>
+                    <p>Di sinilah peran AI menjadi kunci. Dengan kemampuan untuk mengenali pola tersembunyi dari data pasar dan geopolitik, sistem kami dirancang untuk membantu investor mengelola risiko dan menjaga kestabilan portofolio—bukan hanya bereaksi terhadap masa lalu, tapi juga mengantisipasi masa depan.</p>
+                </div>
+            </div>
+        </section>
+        <!-- Bagian 2: Dari Mana Datanya? (Sumber Data) -->
+        <section class="data-sources">
+            <div class="data-cols">
+                <div class="data-text">
+                    <h2>Dari Mana Datanya?</h2>
+                    <ul>
+                        <li><b>Data Pasar Saham</b><br>
+                        Data harian dari 11 sektor utama IDX, memberikan gambaran dinamis tiap sektor.</li>
+                        <li><b>Indeks Risiko Geopolitik (GPR)</b><br>
+                        Indeks GPR dari analisis berita internasional, mencerminkan tingkat ketegangan global dan digunakan sebagai indikator prediksi.</li>
+                    </ul>
+                    <p>Semua data diselaraskan harian agar model bisa melihat dampak langsung ketegangan global ke volatilitas sektor di Indonesia.</p>
+                </div>
+                <div class="data-img" style="display:flex;justify-content:center;align-items:center;min-width:260px;">
+                    <lottie-player src="Data_Scanning.json" background="transparent" speed="1" style="width: 260px; height: 260px;" loop autoplay></lottie-player>
+                </div>
+            </div>
+        </section>
+        <!-- Bagian 3: Bagaimana Sistem Ini Bekerja? (Prediksi dan Keputusan) -->
+        <section class="system-how">
+            <h2>Bagaimana Sistem Ini Bekerja?</h2>
+            <div class="system-steps">
+                <div class="system-step">
+                    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;">
+                        <lottie-player src="forecasting.json" background="transparent" speed="1" style="width: 200px; height: 200px; margin-bottom:8px;" loop autoplay></lottie-player>
+                        <h3 style="margin:0;text-align:center;">1. Prediksi Volatilitas dengan Deep Learning</h3>
+                    </div>
+                    <p style="text-align:center;">Model AI (LSTM, TFT) mempelajari pola perubahan sektor dan risiko geopolitik untuk memprediksi volatilitas sektor.</p>
+                </div>
+                <div class="system-step">
+                    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;">
+                        <lottie-player src="DRL_animation.json" background="transparent" speed="1" style="width: 200px; height: 200px; margin-bottom:8px;" loop autoplay></lottie-player>
+                        <h3 style="margin:0;text-align:center;">2. Pengambilan Keputusan dengan DRL</h3>
+                    </div>
+                    <p style="text-align:center;">Agent DRL menyusun strategi alokasi portofolio secara adaptif berdasarkan hasil prediksi dan simulasi pasar.</p>
+                </div>
+            </div>
+            <p style="margin-top:18px;">Sistem kami belajar, beradaptasi, dan mengambil keputusan untuk membantu investor tetap tangguh di pasar yang tidak pasti.</p>
+        </section>
+        <!-- Alur Sistem (Flowchart) -->
+        <section class="flowchart">
+            <h3>Alur Sistem</h3>
+            <div class="flowchart-row">
+                <span class="flowchart-block">Data Harian 📊</span>
+                <span class="flowchart-arrow">→</span>
+                <span class="flowchart-block">Prediksi Volatilitas 📈</span>
+                <span class="flowchart-arrow">→</span>
+                <span class="flowchart-block">DRL Agent 💡</span>
+                <span class="flowchart-arrow">→</span>
+                <span class="flowchart-block">Rekomendasi Alokasi Dana</span>
+            </div>
+        </section>
+        <!-- Fitur Utama: Simulasi Prediksi -->
+        <section id="simulasi" class="simulasi">
+            <h2>🎯 Prediksi Volatilitas Per Sektor (Interaktif)</h2>
+            <div class="simulasi-controls">
+                <div class="sektor-list" id="sektorCheckboxes">
+                    <label><input type="checkbox" value="Basic Materials"> Basic Materials</label>
+                    <label><input type="checkbox" value="Consumer Cyclicals"> Consumer Cyclicals</label>
+                    <label><input type="checkbox" value="Consumer Non-Cyclicals"> Consumer Non-Cyclicals</label>
+                    <label><input type="checkbox" value="Energy"> Energy</label>
+                    <label><input type="checkbox" value="Financials"> Financials</label>
+                    <label><input type="checkbox" value="Industrials"> Industrials</label>
+                    <label><input type="checkbox" value="Infrastuctures"> Infrastuctures</label>
+                    <label><input type="checkbox" value="Kesehatan"> Kesehatan</label>
+                    <label><input type="checkbox" value="Properties & Real Estate"> Properties & Real Estate</label>
+                    <label><input type="checkbox" value="Technology"> Technology</label>
+                    <label><input type="checkbox" value="Transportation & Logistic"> Transportation & Logistic</label>
+                </div>
+                <div class="simulasi-btns">
+                    <button id="selectAllBtn" class="secondary-btn">Pilih Semua</button>
+                    <button id="simulasiPredictBtn" class="primary-btn">Prediksi Sekarang</button>
+                    <button id="resetBtn" class="secondary-btn" style="display:none;">Reset</button>
+                </div>
+                <div id="simulasiLoader" class="loader" style="display:none;"></div>
+                <div id="simulasiStatus" class="simulasi-status"></div>
+            </div>
+            <div id="simulasiChart" class="simulasi-chart"></div>
+        </section>
+        <!-- Penutup: Ringkasan Singkat yang Menarik -->
+        <section class="summary">
+            <h2>✨ Kenapa Sistem Ini Penting?</h2>
+            <div class="summary-cards">
+                <div class="summary-card">
+                    <span class="emoji">📈</span>
+                    <h3>Memprediksi Ketidakstabilan Pasar</h3>
+                    <p>Proaktif, bukan reaktif, menghadapi gejolak global.</p>
+                </div>
+                <div class="summary-card">
+                    <span class="emoji">🔄</span>
+                    <h3>Alokasi Dana Adaptif</h3>
+                    <p>Portofolio otomatis menyesuaikan saat konflik terjadi.</p>
+                </div>
+                <div class="summary-card">
+                    <span class="emoji">🧠</span>
+                    <h3>Keputusan Berbasis Data</h3>
+                    <p>Investor dibantu AI, bukan sekadar intuisi.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <span>Kontak: <a href="mailto:dev@idxai.com">dev@idxai.com</a></span> |
+            <a href="https://github.com/idxai/portfolio-optimization" target="_blank">GitHub</a> |
+            <span>2025 &copy; IDX AI Portfolio Optimization</span>
+        </div>
+    </footer>
+    <script src="main.js"></script>
+</body>
+</html>
