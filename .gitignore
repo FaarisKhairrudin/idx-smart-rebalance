@@ -18,11 +18,12 @@ wandb/
 outputs/
 
 # Data & models (keep folder, ignore isi)
-notebook/
+notebook/**
 !notebook/.gitkeep
 
-saved_models/
+saved_models/*
 !saved_models/.gitkeep
+!saved_models/Forecast_Model
 
 # Secrets
 .env
