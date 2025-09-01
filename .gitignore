@@ -24,6 +24,8 @@ notebook/**
 saved_models/*
 !saved_models/.gitkeep
 !saved_models/Forecast_Model
+!saved_models/DRL_Model/SAC_Portfolio.zip
+!saved_models/DRL_Model/standard_scaler.pkl
 
 # Secrets
 .env

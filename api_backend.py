@@ -1,7 +1,8 @@
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
-from src.predict import generate_all_predictions
+from src.predict import generate_all_predictions, process_and_predict_drl
+from src.get_data import get_sector_and_article_data
 import threading
 import time
 
@@ -22,11 +23,17 @@ process_status = {"status": "Idle", "result": None}
 
 def run_prediction_pipeline(model_save_dir, horizon):
     global process_status
-    process_status["status"] = "Mengambil data..."
-    # time.sleep(1)  # Simulasi delay, bisa dihapus
+    process_status["status"] = "Mengunduh data terbaru..."
     try:
+        df = get_sector_and_article_data()
         process_status["status"] = "Melakukan prediksi..."
-        final_data, final_predictions_df = generate_all_predictions(model_save_dir, horizon)
+        final_data, final_predictions_df = generate_all_predictions(df, model_save_dir, horizon)
+        # Jalankan DRL recommendation
+        recommendations = process_and_predict_drl(
+            final_data, final_predictions_df,
+            model_path="saved_models/DRL_Model/SAC_Portfolio.zip",
+            scaler_path="saved_models/DRL_Model/standard_scaler.pkl"
+        )
         # Konversi kolom datetime dan Timestamp ke string agar bisa di-serialize ke JSON
         import pandas as pd
         def convert_datetime(df):
@@ -37,16 +44,19 @@ def run_prediction_pipeline(model_save_dir, horizon):
             return df
         final_data = convert_datetime(final_data)
         final_predictions_df = convert_datetime(final_predictions_df)
+        recommendations = convert_datetime(recommendations)
         process_status["status"] = "Selesai"
         process_status["result"] = {
             "data": final_data.to_dict(orient="records") if final_data is not None else [],
-            "predictions": final_predictions_df.to_dict(orient="records") if final_predictions_df is not None else []
+            "predictions": final_predictions_df.to_dict(orient="records") if final_predictions_df is not None else [],
+            "recommendations": recommendations.to_dict(orient="records") if recommendations is not None else []
         }
     except Exception as e:
         process_status["status"] = f"Error: {str(e)}"
         process_status["result"] = {
             "data": [],
-            "predictions": []
+            "predictions": [],
+            "recommendations": []
         }
 
 @app.get("/predict")
