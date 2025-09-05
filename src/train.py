@@ -25,7 +25,7 @@ def run_all_sector_forecast(df, settings, base_config, save_dir='./final_models'
     def prepare_data(df, sector, feature):
         df_sector = df[df['Sector'] == sector].copy()
         if feature:
-            df_sector[feature] = df_sector[feature].rolling(window=7, min_periods=1).sum()
+            df_sector[feature] = df_sector[feature]
             df_sector = df_sector.rename(columns={'Date': 'ds', 'SectorVolatility_7d': 'y', feature: 'x'})
             df_sector['unique_id'] = sector
             df_sector = df_sector[['unique_id', 'ds', 'y', 'x']]
@@ -128,26 +128,29 @@ def run_all_sector_forecast(df, settings, base_config, save_dir='./final_models'
 
 
 if __name__ == "__main__":
-    data_path = 'data/sector_vol_with_geo_2_7d.csv'
-    model_save_dir = './final_models'
-    
+    import os
+
+    BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    data_path = os.path.join(BASE_DIR, "data", "df_final_update.csv")
+    model_save_dir = os.path.join(BASE_DIR, "saved_models", "Forecast_Models_Final")
+
     settings = [
         {"sector": "Basic Materials", "feature": "GPR_Threat_Daily", "model": "NHITS"},
         {"sector": "Consumer Cyclicals", "feature": "ArticlesCount_Daily", "model": "NBEATSx"},
         {"sector": "Consumer Non-Cyclicals", "feature": "GPR_Threat_Daily", "model": "TFT"},
-        # {"sector": "Energy", "feature": "GPR_Threat_Daily", "model": "LSTM"},
-        # {"sector": "Financials", "feature": "GPR_Threat_Daily", "model": "TFT"},
-        # {"sector": "Industrials", "feature": "ArticlesCount_Daily", "model": "NBEATSx"},
-        # {"sector": "Infrastuctures", "feature": "GPR_Daily", "model": "TFT"},
-        # {"sector": "Kesehatan", "feature": None, "model": "LSTM"},
-        # {"sector": "Properties & Real Estate", "feature": "GPR_Threat_Daily", "model": "NHITS"},
-        # {"sector": "Technology", "feature": "GPR_Action_Daily", "model": "TFT"},
-        # {"sector": "Transportation & Logistic", "feature": "GPR_Action_Daily", "model": "LSTM"},
+        {"sector": "Energy", "feature": "GPR_Threat_Daily", "model": "LSTM"},
+        {"sector": "Financials", "feature": "GPR_Threat_Daily", "model": "TFT"},
+        {"sector": "Industrials", "feature": "ArticlesCount_Daily", "model": "NBEATSx"},
+        {"sector": "Infrastuctures", "feature": "GPR_Daily", "model": "TFT"},
+        {"sector": "Kesehatan", "feature": None, "model": "LSTM"},
+        {"sector": "Properties & Real Estate", "feature": "GPR_Threat_Daily", "model": "NHITS"},
+        {"sector": "Technology", "feature": "GPR_Action_Daily", "model": "TFT"},
+        {"sector": "Transportation & Logistic", "feature": "GPR_Action_Daily", "model": "LSTM"},
     ]
 
     base_config = {
         'input_size': 30,
-        'max_steps': 1000,
+        'max_steps': 1500,
         'batch_size': 64,
         'early_stop_patience_steps': 50,
         'scaler_type': 'minmax',
