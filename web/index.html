@@ -27,7 +27,7 @@
         <section class="background-narrative">
             <div class="background-cols">
                 <div class="background-img">
-                    <lottie-player src="Globe_header.json" background="transparent" speed="1" style="width: 220px; height: 220px;" loop autoplay></lottie-player>
+                    <lottie-player src="Globe_World.json" background="transparent" speed="1" style="width: 220px; height: 220px;" loop autoplay></lottie-player>
                 </div>
                 <div class="background-text">
                     <h2>Tantangan Volatilitas & Pentingnya Pendekatan Baru</h2>
@@ -64,7 +64,7 @@
                         <lottie-player src="forecasting.json" background="transparent" speed="1" style="width: 200px; height: 200px; margin-bottom:8px;" loop autoplay></lottie-player>
                         <h3 style="margin:0;text-align:center;">1. Prediksi Volatilitas dengan Deep Learning</h3>
                     </div>
-                    <p style="text-align:center;">Model AI (LSTM, TFT) mempelajari pola perubahan sektor dan risiko geopolitik untuk memprediksi volatilitas sektor.</p>
+                    <p style="text-align:center;">Model AI (LSTM, TFT, N-HiTS, N-BEATS) mempelajari pola perubahan sektor dan risiko geopolitik untuk memprediksi volatilitas sektor.</p>
                 </div>
                 <div class="system-step">
                     <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;">
@@ -74,7 +74,6 @@
                     <p style="text-align:center;">Agent DRL menyusun strategi alokasi portofolio secara adaptif berdasarkan hasil prediksi dan simulasi pasar.</p>
                 </div>
             </div>
-            <p style="margin-top:18px;">Sistem kami belajar, beradaptasi, dan mengambil keputusan untuk membantu investor tetap tangguh di pasar yang tidak pasti.</p>
         </section>
         <!-- Alur Sistem (Flowchart) -->
         <section class="flowchart">
@@ -89,30 +88,51 @@
                 <span class="flowchart-block">Rekomendasi Alokasi Dana</span>
             </div>
         </section>
-        <!-- Fitur Utama: Simulasi Prediksi -->
-        <section id="simulasi" class="simulasi">
-            <h2>🎯 Prediksi Volatilitas Per Sektor (Interaktif)</h2>
-            <div class="simulasi-controls">
-                <div class="sektor-list" id="sektorCheckboxes">
-                    <label><input type="checkbox" value="Basic Materials"> Basic Materials</label>
-                    <label><input type="checkbox" value="Consumer Cyclicals"> Consumer Cyclicals</label>
-                    <label><input type="checkbox" value="Consumer Non-Cyclicals"> Consumer Non-Cyclicals</label>
-                    <label><input type="checkbox" value="Energy"> Energy</label>
-                    <label><input type="checkbox" value="Financials"> Financials</label>
-                    <label><input type="checkbox" value="Industrials"> Industrials</label>
-                    <label><input type="checkbox" value="Infrastuctures"> Infrastuctures</label>
-                    <label><input type="checkbox" value="Kesehatan"> Kesehatan</label>
-                    <label><input type="checkbox" value="Properties & Real Estate"> Properties & Real Estate</label>
-                    <label><input type="checkbox" value="Technology"> Technology</label>
-                    <label><input type="checkbox" value="Transportation & Logistic"> Transportation & Logistic</label>
+         <section id="nominal-section">
+            <!-- Loading Overlay -->
+            <div id="loadingOverlay" class="loading-overlay" style="display:none;">
+                <div class="loading-content">
+                    <lottie-player src="Loading_circles.json" background="transparent" speed="1" style="width: 200px; height: 200px;" loop autoplay></lottie-player>
+                    <div class="loading-text" id="loadingText">Memulai prediksi...</div>
                 </div>
-                <div class="simulasi-btns">
-                    <button id="selectAllBtn" class="secondary-btn">Pilih Semua</button>
-                    <button id="simulasiPredictBtn" class="primary-btn">Prediksi Sekarang</button>
-                    <button id="resetBtn" class="secondary-btn" style="display:none;">Reset</button>
+            </div>
+            
+            <h2>💰 Rekomendasi Portofolio</h2>
+            <div class="main-flex-container" id="nominalFlexContainer">
+                <div class="flex-left">
+                    <form class="money-form" id="moneyForm">
+                        <label for="number_input" class="money-label">Masukkan nominal dana:</label>
+                        <div class="money-input-group">
+                            <span class="money-currency">IDR</span>
+                            <input type="text" id="number_input" name="number_input" required class="money-input" inputmode="numeric" pattern="\d*" autocomplete="off">
+                        </div>
+                        <button type="submit" class="money-submit"><span>Submit</span></button>
+                    </form>
                 </div>
-                <div id="simulasiLoader" class="loader" style="display:none;"></div>
-                <div id="simulasiStatus" class="simulasi-status"></div>
+                <div class="flex-right" id="nominalResult" style="display:none;">
+                    <div class="money-display">
+                        <span class="money-display-label">Nominal</span>
+                        <span class="money-display-value" id="moneyDisplayValue">Rp 0</span>
+                    </div>
+                </div>
+            </div>
+            <div class="pie-chart-container" id="pieChartContainer" style="display:none;">
+                <h3 class="pie-chart-title">Distribusi Portofolio</h3>
+                <div id="pieChart" class="pie-chart"></div>
+            </div>
+            <div class="sector-table-container" id="sectorTableContainer" style="display:none;">
+                <table class="sector-table">
+                    <thead>
+                        <tr>
+                            <th>Sektor</th>
+                            <th>Persentase</th>
+                            <th>Nominal</th>
+                        </tr>
+                    </thead>
+                    <tbody id="sectorTableBody">
+                        <!-- Diisi oleh JS -->
+                    </tbody>
+                </table>
             </div>
             <div id="simulasiChart" class="simulasi-chart"></div>
         </section>
@@ -141,9 +161,9 @@
     <!-- Footer -->
     <footer>
         <div class="footer-content">
-            <span>Kontak: <a href="mailto:dev@idxai.com">dev@idxai.com</a></span> |
-            <a href="https://github.com/idxai/portfolio-optimization" target="_blank">GitHub</a> |
-            <span>2025 &copy; IDX AI Portfolio Optimization</span>
+            <span>Kontak: <a href="mailto:arkhan.falihfp@gmail.com">arkhan.falihfp@gmail.com</a></span> |
+            <a href="https://github.com/FaarisKhairrudin/idx-smart-rebalance.git" target="_blank">GitHub</a> |
+            <span>2025 &copy; AI-Portfolio Optimization</span>
         </div>
     </footer>
     <script src="main.js"></script>
