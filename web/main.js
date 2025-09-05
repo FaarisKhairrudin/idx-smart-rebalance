@@ -363,11 +363,11 @@ document.addEventListener('DOMContentLoaded', function() {
                         width: 3
                     }
                 },
-                textinfo: 'percent',
-                textposition: 'auto',
+                textinfo: 'none',
+                textposition: 'inside',
                 textfont: {
                     size: 13,
-                    color: '#ffffff',
+                    color: '#000000',
                     family: 'Segoe UI, Arial, sans-serif'
                 },
                 insidetextorientation: 'radial',
@@ -391,11 +391,11 @@ document.addEventListener('DOMContentLoaded', function() {
                         width: 3
                     }
                 },
-                textinfo: 'percent',
-                textposition: 'auto',
+                textinfo: 'none',
+                textposition: 'inside',
                 textfont: {
                     size: 13,
-                    color: '#ffffff',
+                    color: '#000000',
                     family: 'Segoe UI, Arial, sans-serif'
                 },
                 insidetextorientation: 'radial',
@@ -411,28 +411,36 @@ document.addEventListener('DOMContentLoaded', function() {
             showlegend: true,
             legend: {
                 orientation: 'v',
-                x: 1.05,
+                x: 1,
                 y: 0.5,
                 xanchor: 'left',
                 yanchor: 'middle',
                 font: {
-                    size: 11,
+                    size: 14,
                     color: '#0077b6',
                     family: 'Segoe UI, Arial, sans-serif'
                 },
-                bgcolor: 'rgba(255,255,255,0.9)',
-                bordercolor: 'rgba(0,119,182,0.2)',
-                borderwidth: 1,
+                bgcolor: 'rgba(255,255,255,0.95)',
+                bordercolor: 'rgba(0,119,182,0.3)',
+                borderwidth: 2,
                 itemsizing: 'constant',
-                itemwidth: 30
+                itemwidth: 35,
+                itemclick: 'toggle',
+                itemdoubleclick: 'toggleothers',
+                tracegroupgap: 5,
+                traceorder: 'normal'
             },
             margin: {
-                t: 20,
-                b: 20,
-                l: 20,
-                r: 180,
-                autoexpand: false
+                t: 40,
+                b: 40,
+                l: 40,
+                r: 250,
+                autoexpand: false,
+                pad: 0
             },
+            width: 800,
+            height: 450,
+            autosize: false,
             paper_bgcolor: 'rgba(0,0,0,0)',
             plot_bgcolor: 'rgba(0,0,0,0)',
             font: {
@@ -466,11 +474,22 @@ document.addEventListener('DOMContentLoaded', function() {
         };
         
         const config = {
-            responsive: true,
+            responsive: false,
             displayModeBar: false,
             doubleClick: false,
             showTips: false,
-            staticPlot: false
+            staticPlot: false,
+            scrollZoom: false,
+            editable: false,
+            autosizable: false,
+            fillFrame: false,
+            toImageButtonOptions: {
+                format: 'png',
+                filename: 'portfolio_distribution',
+                height: 450,
+                width: 800,
+                scale: 1
+            }
         };
         
         // Responsive legend adjustment
@@ -478,11 +497,14 @@ document.addEventListener('DOMContentLoaded', function() {
         if (isMobile) {
             layout.legend.orientation = 'h';
             layout.legend.x = 0.5;
-            layout.legend.y = -0.2;
+            layout.legend.y = -0.1;
             layout.legend.xanchor = 'center';
             layout.legend.yanchor = 'top';
-            layout.margin.b = 80;
-            layout.margin.r = 20;
+            layout.legend.font.size = 12;
+            layout.margin.b = 120;
+            layout.margin.r = 40;
+            layout.width = 400;
+            layout.height = 350;
         }
         
         // Cek apakah chart sudah pernah dibuat
@@ -512,6 +534,73 @@ document.addEventListener('DOMContentLoaded', function() {
             // Update chart yang sudah ada tanpa animasi
             Plotly.react('pieChart', chartData, layout, config);
         }
+        
+        // Event listener untuk window resize dan zoom dengan debouncing
+        let resizeTimeout;
+        const handleResize = () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                const isMobileNow = window.innerWidth <= 700;
+                const currentLayout = {
+                    ...layout,
+                    width: null,
+                    height: null,
+                    autosize: true
+                };
+                
+                if (isMobileNow) {
+                    currentLayout.legend = {
+                        ...currentLayout.legend,
+                        orientation: 'h',
+                        x: 0.5,
+                        y: -0.1,
+                        xanchor: 'center',
+                        yanchor: 'top',
+                        font: { ...currentLayout.legend.font, size: 12 },
+                        itemclick: 'toggle',
+                        itemdoubleclick: 'toggleothers'
+                    };
+                    currentLayout.margin = {
+                        ...currentLayout.margin,
+                        b: 120,
+                        r: 40,
+                        l: 40,
+                        t: 40
+                    };
+                    currentLayout.width = 400;
+                    currentLayout.height = 350;
+                } else {
+                    currentLayout.legend = {
+                        ...currentLayout.legend,
+                        orientation: 'v',
+                        x: 1,
+                        y: 0.5,
+                        xanchor: 'left',
+                        yanchor: 'middle',
+                        font: { ...currentLayout.legend.font, size: 14 },
+                        itemclick: 'toggle',
+                        itemdoubleclick: 'toggleothers'
+                    };
+                    currentLayout.margin = {
+                        ...currentLayout.margin,
+                        b: 40,
+                        r: 250,
+                        l: 40,
+                        t: 40
+                    };
+                    currentLayout.width = 800;
+                    currentLayout.height = 450;
+                }
+                
+                if (isPieChartCreated) {
+                    Plotly.relayout('pieChart', currentLayout);
+                }
+            }, 100);
+        };
+        
+        // Hapus event listener lama jika ada, lalu tambahkan yang baru
+        window.removeEventListener('resize', handleResize);
+        window.addEventListener('resize', handleResize);
     }
 });
 
