@@ -17,15 +17,13 @@ from tqdm import tqdm
 def get_processed_stock_data(
     window=7,
     lookback_days=70,
-    delay=0,
     sektor_csv_path="./data/Sector-Faktur.csv",
     full_data=False
 ):
     """
-    Mengambil dan memproses data saham berdasarkan Sector-Faktur.csv
-    Return: DataFrame dengan return harian + rolling sektor volatility & avg return
+    Mengambil dan memproses data saham dengan metode bulk download yang jauh lebih cepat.
     """
-    # --- STEP 1: Load ticker-sektor mapping
+    # --- STEP 1: Load ticker-sektor mapping (Tetap sama)
     if not os.path.exists(sektor_csv_path):
         raise FileNotFoundError(f"❌ File '{sektor_csv_path}' tidak ditemukan.")
 
@@ -34,94 +32,79 @@ def get_processed_stock_data(
         df_sektor.Sector.values,
         index=df_sektor.Faktur.str.strip()
     ).to_dict()
-    tickers = [f"{ticker}.JK" for ticker in ticker_to_sector.keys()]
+    tickers_clean = list(ticker_to_sector.keys())
+    tickers_jk = [f"{ticker}.JK" for ticker in tickers_clean]
 
-    # --- STEP 2: Tentukan tanggal mulai & akhir
+    # --- STEP 2: Tentukan tanggal mulai & akhir (Tetap sama)
     end_date = datetime.today().date()
     if full_data:
-        # start from 2015-01-01
         start_date = datetime(2015, 1, 1).date()
     else:
         start_date = end_date - timedelta(days=lookback_days)
 
-    # --- STEP 3: Download per ticker dengan loading bar
-    successful_data = []
-    
-    print()
-    print("🚀 Memulai pengambilan data saham...")
+    # --- STEP 3 (OPTIMIZED): Download semua data saham SEKALIGUS
+    print(f"🚀 Memulai pengambilan data untuk {len(tickers_jk)} saham (Bulk Download)...")
     print("=" * 50)
     
-    with tqdm(total=len(tickers), desc="📥 Collecting data", 
-              bar_format="{l_bar}{bar}| {n_fmt}/{total_fmt} [{elapsed}<{remaining}, {rate_fmt}]") as pbar:
-        
-        for ticker_jk in tickers:
-            ticker_clean = ticker_jk.replace('.JK', '')
-            sector = ticker_to_sector.get(ticker_clean, 'Unknown')
-
-            try:
-                stock = yf.Ticker(ticker_jk)
-                hist = stock.history(start=start_date, end=end_date)
-
-                if hist.empty:
-                    pbar.set_postfix_str(f"❌ {ticker_jk} - No data")
-                    pbar.update(1)
-                    continue
-
-                df = hist.reset_index()
-                df['Ticker'] = ticker_clean
-                df['Sector'] = sector
-                df['Date'] = pd.to_datetime(df['Date']).dt.date
-
-                df = df[['Date', 'Ticker', 'Sector', 'Open', 'High', 'Low', 'Close', 'Volume']]
-                df[['Open', 'High', 'Low', 'Close']] = df[['Open', 'High', 'Low', 'Close']].round(2)
-                df['Volume'] = df['Volume'].astype('int64')
-
-                successful_data.append(df)
-                pbar.set_postfix_str(f"✅ {ticker_jk} - {len(df)} records")
-
-            except Exception as e:
-                pbar.set_postfix_str(f"❌ {ticker_jk} - {e}")
-            
-            pbar.update(1)
-            time.sleep(delay)
-
+    # yf.download bisa menerima list tickers
+    # progress=True akan menampilkan loading bar bawaan yfinance
+    # threads=True akan menggunakan multithreading untuk download lebih cepat
+    data = yf.download(
+        tickers_jk,
+        start=start_date,
+        end=end_date,
+        progress=True,
+        threads=True, 
+        group_by='ticker' # Ini tidak wajib, tapi kadang memudahkan
+    )
     
-    if not successful_data:
+    if data.empty:
         raise ValueError("❌ Tidak ada data saham yang berhasil diunduh.")
+    
+    print("✅ Download selesai. Memulai proses kalkulasi...")
 
-    # --- STEP 4: Gabungkan dan hitung return harian
-    combined_df = pd.concat(successful_data, ignore_index=True)
+    # --- LANGKAH 4 (BARU): Reshape data dari format 'wide' ke 'long'
+    # Hasil download memiliki format 'wide', kita ubah ke 'long' agar mudah diolah
+    df_long = data.stack(level=0).reset_index()
+    df_long.rename(columns={'level_1': 'Ticker'}, inplace=True)
+    df_long['Ticker'] = df_long['Ticker'].str.replace('.JK', '')
+    
+    # Tambahkan kolom Sektor
+    df_long['Sector'] = df_long['Ticker'].map(ticker_to_sector)
+    df_long['Date'] = pd.to_datetime(df_long['Date']).dt.date
+
+    # --- STEP 5: Gabungkan dan hitung return (sudah terstruktur)
+    combined_df = df_long[['Date', 'Ticker', 'Sector', 'Open', 'High', 'Low', 'Close', 'Volume']].copy()
     combined_df.sort_values(['Ticker', 'Date'], inplace=True)
     combined_df['Return'] = combined_df.groupby('Ticker')['Close'].pct_change()
 
-    # --- STEP 5: Rolling volatility individual
+    # --- STEP 6: Rolling volatility individual
     combined_df['Volatility_Individual'] = (
         combined_df.groupby('Ticker')['Return']
         .rolling(window=window)
-        .std()
-        .reset_index(0, drop=True)
+        .std() # ddof=0 untuk population std dev, lebih stabil jika ada NaN
+        .reset_index(level=0, drop=True)
     )
 
-    # --- STEP 6: Hitung sektor median volatility & avg return harian
+    # --- STEP 7: Hitung sektor median volatility & avg return
     sector_metrics = (
-        combined_df.groupby(['Date', 'Sector'])[['Volatility_Individual', 'Return']]
-        .median()
-        .reset_index()
-        .rename(columns={
-            'Volatility_Individual': f'SectorVolatility_{window}d',
-            'Return': 'SectorReturn_avg'
-        })
+        combined_df.groupby(['Date', 'Sector'])
+        .agg(
+            SectorVolatility_d=('Volatility_Individual', 'median'),
+            SectorReturn_avg=('Return', 'median')
+        ).reset_index()
     )
+    # Ganti nama kolom secara dinamis
+    sector_metrics.rename(columns={'SectorVolatility_d': f'SectorVolatility_{window}d'}, inplace=True)
+    
+    sector_metrics = sector_metrics.dropna()
 
-    # drop NaN values
-    sector_metrics = sector_metrics.dropna(subset=[f'SectorVolatility_{window}d', 'SectorReturn_avg'])
-
-    print(f"✅ Selesai! {len(successful_data)} saham berhasil diproses")
+    print(f"✅ Selesai! Data berhasil diproses.")
     print(f"📅 Dari: {sector_metrics['Date'].min()}")
     print(f"📅 Sampai: {sector_metrics['Date'].max()}")
     print(f"📊 Total records: {len(sector_metrics)}")
     print("=" * 50)
-    print()
+    
     return sector_metrics.reset_index(drop=True)
 
 def download_gpr_data(lookback_days=70, full_data=False):
