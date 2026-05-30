@@ -8,6 +8,6 @@ statsmodels
 stable-baselines3
 gymnasium
 joblib
-uvcorn
+uvicorn
 fastapi
 xlrd
